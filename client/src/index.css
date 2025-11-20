@@ -1,0 +1,198 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+
+  /* Base Backgrounds */
+  --color-bg-primary: #111111; /* #17191D #242424 */
+  --color-bg-secondary: #17191D; /* #202328 #2E2E2E */
+  --color-bg-tertiary: #383838;
+
+  /* Borders */
+  --color-border: #E2E2E2; /* #3D3D3D */
+
+  /* Text */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #B0B0B0;
+  --color-text-navbar: #E0E0E0;
+  --color-text-disabled: #6E6E6E;
+  --color-text-accent: #2196F3;
+
+  /* Buttons */
+  --color-btn-primary-bg: #2196F3;
+  --color-btn-primary-hover: #1976D2;
+  --color-btn-primary-text: #FFFFFF;
+
+  --color-btn-secondary-bg: #4CAF50;
+  --color-btn-secondary-hover: #388E3C;
+  --color-btn-secondary-text: #FFFFFF;
+
+  --color-btn-neutral-bg: #383838;
+  --color-btn-neutral-hover: #4A4A4A;
+  --color-btn-neutral-text: #B0B0B0;
+
+  /* Dropdowns */
+  --color-dropdown-bg: #2E2E2E;
+  --color-dropdown-hover-bg: #383838;
+  --color-dropdown-border: #3D3D3D;
+  --color-dropdown-text: #FFFFFF;
+  --color-dropdown-placeholder: #B0B0B0;
+  --color-dropdown-disabled: #6E6E6E;
+
+  /* Chart Colors */
+  --chart-blue: #2196F3;
+  --chart-yellow: #FFC107;
+  --chart-green: #4CAF50;
+  --chart-red: #F44336;
+  --chart-purple: #9C27B0;
+
+  /* Chart Axis & Grid */
+  --chart-axis-label: #B0B0B0;
+  --chart-gridline: #3D3D3D;
+   
+  /* Table backgrounds */
+  --table-bg: #2E2E2E;
+  --table-header-bg: #383838;
+  --table-row-bg: #2E2E2E;
+  --table-row-alt-bg: #2A2A2A; /* alternating row color */
+  --table-row-hover-bg: #3A3A3A;
+
+  /* Table borders */
+  --table-border: #3D3D3D;
+
+  /* Text */
+  --table-text-header: #FFFFFF;
+  --table-text-body: #B0B0B0;
+  --table-text-highlight: #2196F3; /* highlight cell value */
+  --table-text-disabled: #6E6E6E;
+
+}
+
+/* Light Mode Override */
+body.light {
+  --color-bg-primary: #FAFAFA;
+  /* --color-bg-primary: #E2E2E2; */
+  --color-bg-secondary: #F5F5F5;
+  --color-bg-tertiary: #EEEEEE;
+
+  --color-border: #DDDDDD;
+
+  --color-text-primary: #212121;
+  --color-text-secondary: #424242;
+  --color-text-navbar: #212121;
+  --color-text-disabled: #9E9E9E;
+  --color-text-accent: #1565C0;
+
+  --color-btn-primary-bg: #1565C0;
+  --color-btn-primary-hover: #0D47A1;
+  --color-btn-primary-text: #FFFFFF;
+
+  --color-btn-secondary-bg: #388E3C;
+  --color-btn-secondary-hover: #2E7D32;
+  --color-btn-secondary-text: #FFFFFF;
+
+  --color-btn-neutral-bg: #EAEAEA;
+  --color-btn-neutral-hover: #DDDDDD;
+  --color-btn-neutral-text: #424242;
+
+  --color-dropdown-bg: #FFFFFF;
+  --color-dropdown-hover-bg: #F5F5F5;
+  --color-dropdown-border: #DDDDDD;
+  --color-dropdown-text: #212121;
+  --color-dropdown-placeholder: #9E9E9E;
+  --color-dropdown-disabled: #BDBDBD;
+
+  --chart-axis-label: #424242;
+  --chart-gridline: #DDDDDD;
+
+  /* Table backgrounds */
+  --table-bg: #FFFFFF;
+  --table-header-bg: #747474;
+  --table-row-bg: #FFFFFF;
+  --table-row-alt-bg: #FAFAFA;
+  --table-row-hover-bg: #EAEAEA;
+
+  /* Table borders */
+  --table-border: #DDDDDD;
+
+  /* Text */
+  --table-text-header: #FFFFFF;
+  --table-text-body: #424242;
+  --table-text-highlight: #1565C0;
+  --table-text-disabled: #9E9E9E;
+}
+
+h1 {
+  font-size: 3.2em;
+}
+
+
+/* -------------------- Body -------------------- */
+body {
+  margin: 0;
+  display: flex;
+  /* place-items: center; */
+  min-width: 320px;
+  min-height: 100vh;
+
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Default theme (dark) */
+body.dark {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Light theme */
+body.light {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+/* -------------------- Button -------------------- */
+button {
+  color: var(--color-btn-primary-text)
+}
+
+/* -------------------- Input -------------------- */
+button {
+  color: var(--color-btn-primary-text)
+}
+
+
+/* -------------------- Select -------------------- */
+select {
+  background: var(--color-dropdown-bg);
+  color: var(--color-dropdown-text);
+  border: 1px solid var(--color-dropdown-border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-text-accent);
+}
+
+select option {
+  background: var(--color-dropdown-bg);
+  color: var(--color-dropdown-text);
+}
+
+select option:disabled {
+  color: var(--color-dropdown-disabled);
+}
+
+select option:hover {
+  background: var(--color-dropdown-hover-bg);
+}

@@ -1,0 +1,21 @@
+#root {
+  /* display: flex; */
+  /* text-align: center; */
+  /* max-width: 1280px; */
+  width: 100%;
+  margin: 0 auto;
+  /* padding: 1rem; */
+}
+
+/* ----- Remove scrollbars ----- */
+html, body {
+  overflow-y: scroll;         /* Allow vertical scrolling */
+  overflow-x: auto;           /* Keep horizontal scrollbar visible */
+  scrollbar-width: none;      /* Firefox hides vertical scrollbar */
+  -ms-overflow-style: none;   /* IE and Edge */
+}
+/* Chrome, Safari, and Opera */
+html::-webkit-scrollbar:vertical,
+body::-webkit-scrollbar:vertical {
+  display: none;              /* Hide only the vertical scrollbar */
+}
