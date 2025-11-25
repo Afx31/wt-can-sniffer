@@ -19,3 +19,9 @@ html::-webkit-scrollbar:vertical,
 body::-webkit-scrollbar:vertical {
   display: none;              /* Hide only the vertical scrollbar */
 }
+
+
+/* ----------------------------------------------------------- */
+table, th, td {
+  border: .5px solid #E2E2E2;
+}
