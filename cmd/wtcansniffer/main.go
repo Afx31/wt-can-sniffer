@@ -12,10 +12,28 @@ import (
 	"go.einride.tech/can/pkg/socketcan"
 )
 
-type CanMessage struct {
-	Id 		uint32	`json:"id"`
-	Length 	uint8	`json:"length"`
-	Data 	[]byte	`json:"data"`
+// TODO: Trialing2
+type FrameUpdate struct {
+    Id     	uint32  `json:"id"`
+    Length 	uint8   `json:"length"`
+    Data   	[8]byte `json:"data"`
+}
+
+type CanData struct {
+	Byte0	uint8	`json:"byte0"`
+	Byte1	uint8	`json:"byte1"`
+	Byte2	uint8	`json:"byte2"`
+	Byte3	uint8	`json:"byte3"`
+	Byte4	uint8	`json:"byte4"`
+	Byte5	uint8	`json:"byte5"`
+	Byte6	uint8	`json:"byte6"`
+	Byte7	uint8	`json:"byte7"`
+}
+
+type CanFrame struct {
+	Id 		uint32		`json:"id"`
+	Length 	uint8		`json:"length"`
+	Data 	[]CanData	`json:"data"`
 }
 
 type WtWebSocket struct {
@@ -32,7 +50,6 @@ const (
 )
 
 var (
-	canMsgList = []CanMessage{}
 	addr       = flag.String("addr", WEBSOCKET_PORT, "http service address")
 	// upgrader   = websocket.Upgrader{
 	// 	ReadBufferSize:  1024,
@@ -41,6 +58,8 @@ var (
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
+	// cfMap = make(map[uint32][]CanFrame)
+	cfMap = make(map[uint32]CanFrame)
 )
 
 func main () {
@@ -90,47 +109,53 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, connCAN net.Conn) {
 	defer connWS.conn.Close()
 	fmt.Println("[INFO] Connected to WebSocket")
 
-
 	// Now read CAN Bus, and send to client
 	recv := socketcan.NewReceiver(connCAN)
-
 	for recv.Receive() {
 		frame := recv.Frame()
 
-		newFrame := CanMessage{
-			Id: frame.ID,
-			Length: frame.Length,
-			Data: frame.Data[:],
+		incomingFrameID := frame.ID
+		incomingCanData := CanData{
+			Byte0: frame.Data[0],
+			Byte1: frame.Data[1],
+			Byte2: frame.Data[2],
+			Byte3: frame.Data[3],
+			Byte4: frame.Data[4],
+			Byte5: frame.Data[5],
+			Byte6: frame.Data[6],
+			Byte7: frame.Data[7],
 		}
 
-		canMsgList = append(canMsgList, newFrame)
+		canFrame, exists := cfMap[incomingFrameID]
+		if !exists {
+			canFrame = CanFrame{
+				Id:     incomingFrameID,
+				Length: frame.Length,
+				Data:   []CanData{},
+			}
+		}
+		canFrame.Data = append(canFrame.Data, incomingCanData)
+		cfMap[incomingFrameID] = canFrame
 
-		json, err := json.Marshal(newFrame)
+		frameUpdate := FrameUpdate{
+			Id: incomingFrameID,
+			Length: frame.Length,
+			Data: frame.Data,
+		}
+
+		jsonData, err := json.Marshal(frameUpdate) //canFrame
 		if err != nil {
 			fmt.Println("[ERROR] Marshalling JSON: ", err)
 		}
 
-		err = connWS.conn.WriteMessage(websocket.TextMessage, json)
+		fmt.Println("---------------------------------------------------------------------------------------")
+		fmt.Println("Sending JSON:", string(jsonData))
+		fmt.Println(cfMap)
+
+		err = connWS.conn.WriteMessage(websocket.TextMessage, jsonData)
 		if err != nil {
 			fmt.Println("[ERROR] Sending data to client: ", err)
 			return
 		}
-	}
-}
-
-func readCanBus(connCAN net.Conn) {
-	recv := socketcan.NewReceiver(connCAN)
-
-	for recv.Receive() {
-		fmt.Println("reeeeee")
-		frame := recv.Frame()
-
-		newFrame := CanMessage{
-			Id: frame.ID,
-			Length: frame.Length,
-			Data: frame.Data[:],
-		}
-
-		canMsgList = append(canMsgList, newFrame)
 	}
 }
