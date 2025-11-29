@@ -1,0 +1,15 @@
+.d-container {
+  padding: 1rem;
+}
+
+table, th, td {
+  border: .5px solid #E2E2E2;
+}
+
+th {
+  padding: 5px;
+}
+
+td {
+  padding: 5px;
+}

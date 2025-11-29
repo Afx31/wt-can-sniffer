@@ -34,12 +34,23 @@ export function SocketProvider({ children }) {
         console.log('[DEBUG] Disconnecting from Server')
     }
 
-    function fetchCanMessageIdData(json) {
-
+    function fetchDataFromServer(type, param) {
+        return new Promise((resolve) => {
+            if (type === 'GET-MSG-DATA') {
+                const reqObj = {
+                    id: 1,
+                    data: param
+                }
+                socketRef.current.send(JSON.stringify(reqObj))
+                socketRef.current.onmessage = (e) => {
+                    resolve(JSON.parse(e.data))
+                }
+            }
+        })
     }
 
     return (
-        <SocketContext.Provider value ={{ socketRef, isConnected, handleConnection, handleDisconnection, fetchCanMessageIdData}}>
+        <SocketContext.Provider value ={{ socketRef, isConnected, handleConnection, handleDisconnection, fetchDataFromServer}}>
             {children}
         </SocketContext.Provider>
     )
