@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
+	"sync"
 
 	"github.com/gorilla/websocket"
 	"go.einride.tech/can/pkg/socketcan"
@@ -43,6 +45,11 @@ type WtWebSocket struct {
 	// mutex 	sync.Mutex
 }
 
+type WtWebSocketResponse struct {
+	Type	int		`json:"id"`
+	Data	string	`json:"data"`
+}
+
 // TODO: Reconfigure these later to the settings file
 const (
 	CAN_CHANNEL			= "vcan0"
@@ -58,6 +65,8 @@ var (
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
+	wg sync.WaitGroup
+
 	// cfMap = make(map[uint32][]CanFrame)
 	cfMap = make(map[uint32]CanFrame)
 )
@@ -109,6 +118,15 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, connCAN net.Conn) {
 	defer connWS.conn.Close()
 	fmt.Println("[INFO] Connected to WebSocket")
 
+	
+	// Listen for responses from client
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		webSocketListener(connWS)
+	}()
+
+
 	// Now read CAN Bus, and send to client
 	recv := socketcan.NewReceiver(connCAN)
 	for recv.Receive() {
@@ -148,14 +166,57 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, connCAN net.Conn) {
 			fmt.Println("[ERROR] Marshalling JSON: ", err)
 		}
 
-		fmt.Println("---------------------------------------------------------------------------------------")
-		fmt.Println("Sending JSON:", string(jsonData))
-		fmt.Println(cfMap)
-
 		err = connWS.conn.WriteMessage(websocket.TextMessage, jsonData)
 		if err != nil {
 			fmt.Println("[ERROR] Sending data to client: ", err)
 			return
+		}
+	}
+}
+
+func webSocketListener(connWS WtWebSocket) {
+	for {
+		_, msg, err := connWS.conn.ReadMessage()
+		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				fmt.Println("[INFO] WebSocket disconnected..")
+				return
+			} else {
+				fmt.Println("[INFO] Unexpected disconnection: ", err)
+			}
+		}
+
+		var mesRes WtWebSocketResponse
+		err = json.Unmarshal(msg, &mesRes)
+		if err != nil {
+			fmt.Println("[ERROR] Unmarshalling from client: ", err)
+			continue
+		}
+
+		switch mesRes.Type {
+		case 1: // GET-MSG-DATA-{id}
+			// Lookup the provided CAN Id, get the data, return to client
+			u64, err := strconv.ParseUint(mesRes.Data, 10, 32)
+			if err != nil {
+				fmt.Println("[ERROR] Converting CAN Id input from client")
+				return
+			}
+
+			canId := uint32(u64)
+			canFrame, exists := cfMap[canId]
+			if exists {
+				jsonData, err := json.Marshal(canFrame)
+				if err != nil {
+					fmt.Println("[ERROR] Marshalling JSON: ", err)
+					return
+				}
+
+				err = connWS.conn.WriteMessage(websocket.TextMessage, jsonData)
+				if err != nil {
+					fmt.Println("[ERROR] Sending data to client: ", err)
+					return
+				}
+			}
 		}
 	}
 }
