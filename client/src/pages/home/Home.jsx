@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 // import React from 'react';
 
 export default function Home() {
-  const { socketRef, isConnected, handleConnection, handleDisconnection } = useSocket()
+  const { socketRef, isConnected } = useSocket()
   const [canData, setCanData] = useState({})
 
   useEffect(() => {
@@ -42,13 +42,6 @@ export default function Home() {
 
   return (
     <div className='h-container'>
-      <button
-        onClick={isConnected ? handleDisconnection : handleConnection}
-      >
-        {isConnected ? 'Disconnect' : 'Connect'}
-      </button>
-      <p>CAN Bus data</p>
-
       <table>
         <thead>
           <tr>
