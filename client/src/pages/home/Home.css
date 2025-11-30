@@ -2,6 +2,9 @@
   padding: 1rem;
 }
 
+.h-container table {
+  margin-top: 1rem;
+}
 .h-container table, th, td {
   border: .5px solid #E2E2E2;
 }
