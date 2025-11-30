@@ -2,14 +2,22 @@
   padding: 1rem;
 }
 
-table, th, td {
+.h-container table, th, td {
   border: .5px solid #E2E2E2;
 }
 
-th {
+.h-container th {
+  padding: 10px;
+}
+
+.h-container td {
   padding: 5px;
 }
 
-td {
-  padding: 5px;
+.msg-link {
+  text-decoration: underline;
+  color: #FFF;
+}
+.msg-link:visited {
+  color: #FFF;
 }
