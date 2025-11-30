@@ -18,7 +18,7 @@ export default function Details() {
 
 	return (
 		<div className='d-container'>
-			<h2>Message: { id }</h2>
+			<h2>CAN ID: { id }</h2>
 			<table>
 				<thead>
 				<tr>
@@ -34,9 +34,9 @@ export default function Details() {
 				</tr>
 				</thead>
 				<tbody>
-					{canData?.data?.map((item, idx) => (
-						<tr key={idx + 1}>
-							<td>{idx}</td>
+					{canData?.data?.reverse().map((item, index) => (
+						<tr key={canData.data.length - 1 - index}>
+							<td>{canData.data.length - 1 - index}</td>
 							{Object.values(item).map((v, i) => (
 								<td key={i}>{v}</td>
 							))}

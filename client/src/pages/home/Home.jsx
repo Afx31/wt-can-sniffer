@@ -1,9 +1,7 @@
 import './Home.css'
 import { useSocket } from '../../contexts/SocketContext';
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-
-// import React from 'react';
+import { NavLink } from 'react-router-dom'
 
 export default function Home() {
   const { socketRef, isConnected } = useSocket()
@@ -61,7 +59,7 @@ export default function Home() {
           {Object.values(canData).map(frame => (
             <tr key={frame.id}>
               <td>
-                <Link to={`/details/${frame.id}`}>{frame.id}</Link>
+                <NavLink className='msg-link' to={`/details/${frame.id}`}>{frame.id}</NavLink>
               </td>
               <td>{frame.length}</td>
               {frame.data.map((d, i) => (
