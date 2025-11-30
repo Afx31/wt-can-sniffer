@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 
@@ -16,48 +18,48 @@ import (
 
 // TODO: Trialing2
 type FrameUpdate struct {
-    Id     	uint32  `json:"id"`
-    Length 	uint8   `json:"length"`
-    Data   	[8]byte `json:"data"`
+	Id     uint32  `json:"id"`
+	Length uint8   `json:"length"`
+	Data   [8]byte `json:"data"`
 }
 
 type CanData struct {
-	Byte0	uint8	`json:"byte0"`
-	Byte1	uint8	`json:"byte1"`
-	Byte2	uint8	`json:"byte2"`
-	Byte3	uint8	`json:"byte3"`
-	Byte4	uint8	`json:"byte4"`
-	Byte5	uint8	`json:"byte5"`
-	Byte6	uint8	`json:"byte6"`
-	Byte7	uint8	`json:"byte7"`
+	Byte0 uint8 `json:"byte0"`
+	Byte1 uint8 `json:"byte1"`
+	Byte2 uint8 `json:"byte2"`
+	Byte3 uint8 `json:"byte3"`
+	Byte4 uint8 `json:"byte4"`
+	Byte5 uint8 `json:"byte5"`
+	Byte6 uint8 `json:"byte6"`
+	Byte7 uint8 `json:"byte7"`
 }
 
 type CanFrame struct {
-	Id 		uint32		`json:"id"`
-	Length 	uint8		`json:"length"`
-	Data 	[]CanData	`json:"data"`
+	Id     uint32    `json:"id"`
+	Length uint8     `json:"length"`
+	Data   []CanData `json:"data"`
 }
 
 type WtWebSocket struct {
-	conn		*websocket.Conn
-	addr		string
-	upgrader 	websocket.Upgrader
+	conn     *websocket.Conn
+	addr     string
+	upgrader websocket.Upgrader
 	// mutex 	sync.Mutex
 }
 
 type WtWebSocketResponse struct {
-	Type	int		`json:"id"`
-	Data	string	`json:"data"`
+	Type int    `json:"id"`
+	Data string `json:"data"`
 }
 
 // TODO: Reconfigure these later to the settings file
 const (
-	CAN_CHANNEL			= "vcan0"
-	WEBSOCKET_PORT		= "localhost:8080"
+	CAN_CHANNEL    = "vcan0"
+	WEBSOCKET_PORT = "localhost:8080"
 )
 
 var (
-	addr       = flag.String("addr", WEBSOCKET_PORT, "http service address")
+	addr = flag.String("addr", WEBSOCKET_PORT, "http service address")
 	// upgrader   = websocket.Upgrader{
 	// 	ReadBufferSize:  1024,
 	// 	WriteBufferSize: 1024,
@@ -88,7 +90,7 @@ func main () {
 	// NOTE:
 	// - Starts http server listening on `addr`
 	// - `ListenAndServer` will continue listening in the background after WebSocket disconnections, to try reconnect itself when it receives another `/ws` request from WebClient
-	
+
 	//err = http.ListenAndServe(*addr, nil)
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -101,7 +103,7 @@ func handleCanBusConnect() (net.Conn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("CAN Bus connection error: %w", err)
 	}
-	
+
 	fmt.Println("[INFO] Successfully connected to CAN Bus")
 	return connCAN, nil
 }
@@ -118,7 +120,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, connCAN net.Conn) {
 	defer connWS.conn.Close()
 	fmt.Println("[INFO] Connected to WebSocket")
 
-	
+
 	// Listen for responses from client
 	wg.Add(1)
 	go func() {
@@ -156,9 +158,9 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, connCAN net.Conn) {
 		cfMap[incomingFrameID] = canFrame
 
 		frameUpdate := FrameUpdate{
-			Id: incomingFrameID,
+			Id:     incomingFrameID,
 			Length: frame.Length,
-			Data: frame.Data,
+			Data:   frame.Data,
 		}
 
 		jsonData, err := json.Marshal(frameUpdate) //canFrame
@@ -217,6 +219,31 @@ func webSocketListener(connWS WtWebSocket) {
 					return
 				}
 			}
+
+		case 2: // Write dataset to file
+			saveDataToFile()
 		}
 	}
+}
+
+func saveDataToFile() {
+	dir, err := os.Getwd()
+    if err != nil {
+        fmt.Println("[ERROR] Unable to get current working directory: ", err)
+		return
+    }
+
+	parentDir := filepath.Dir(dir)
+
+	f, err := os.Create(filepath.Join(parentDir, "wt-can-sniffer-output.json"))
+	if err != nil {
+		fmt.Println("[ERROR] Creating JSON file: ", err)
+		return
+	}
+	defer f.Close()
+
+	json.NewEncoder(f).Encode(cfMap)
+
+	fmt.Println("[INFO] Written file successfully")
+
 }
