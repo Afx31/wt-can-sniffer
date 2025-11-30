@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Improve navigation with navbar
 - View page for individual CAN message to show all data
 - Store all CAN data per CAN Id
 - Read and display CAN Gen test data to UI
