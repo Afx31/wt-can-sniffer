@@ -15,6 +15,17 @@
     gap: 10px;
 }
 
+a.navbar-item {
+  font-size: large;
+  padding: 10px;
+}
+.btn-save-to-file:hover {
+  background-color: #7f7f7f;
+  border-color: #7f7f7f;
+  cursor: pointer;
+}
+
+
 .navbar-item {
     text-decoration: none;
     color: #E3E3E3;

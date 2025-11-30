@@ -3,12 +3,24 @@ import { NavLink } from 'react-router-dom'
 import { useSocket } from '../../contexts/SocketContext'
 
 export default function Navbar() {
-	const { socketRef, isConnected, handleConnection, handleDisconnection } = useSocket()
+	const { isConnected, handleConnection, handleDisconnection, sendReqToServer } = useSocket()
+
+	function handleSaveToFile() {
+		sendReqToServer(2, 'test').then((res) => {
+		})
+	}
 
 	return (
 		<nav className='navbar-container'>
 			<div className='navbar-left'>
 				<NavLink to='/' className='navbar-item'>Home</NavLink>
+				<button
+					className='btn-save-to-file'
+					onClick={handleSaveToFile}
+				>
+					Save to file
+				</button>
+					
 			</div>
 			<div className='navbar-right'>
 				<button

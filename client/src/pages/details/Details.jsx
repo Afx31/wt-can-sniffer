@@ -5,13 +5,13 @@ import { useSocket } from '../../contexts/SocketContext'
 
 export default function Details() {
 	const { id } = useParams()
-	const { socketRef, isConnected, fetchDataFromServer } = useSocket()
+	const { socketRef, isConnected, sendReqToServer } = useSocket()
 	const [canData, setCanData] = useState({})
 
 	useEffect(() => {
 		if (!isConnected || !socketRef.current) return
 
-		fetchDataFromServer('GET-MSG-DATA', id).then((res) => {
+		sendReqToServer(1, id).then((res) => {
 			setCanData(res)
 		})		
 	}, [])
